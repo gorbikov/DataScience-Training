@@ -1,0 +1,2 @@
+def showinfo():
+    print('something')
