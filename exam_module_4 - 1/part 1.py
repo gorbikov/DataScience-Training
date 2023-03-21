@@ -1,15 +1,18 @@
 # Настраиваем импорты.
+import os.path
+import pathlib
+from pathlib import Path
 import pandas as pd
 from eda import *
 
 # Вводные.
-trainPath = 'data/exam_module_4/1_variant_dna_sequence_mutation_prediction/input/train.csv'
-testPath = 'data/exam_module_4/1_variant_dna_sequence_mutation_prediction/input/test.csv'
+trainPath = Path('data/exam_module_4/1_variant_dna_sequence_mutation_prediction/input/train.csv')
+testPath = Path('data/exam_module_4/1_variant_dna_sequence_mutation_prediction/input/test.csv')
 cvFraction = 0.15
 # Фиксируем рандом.
 randomCeed = 777
 # Получаем имя текущего скрипта для сохранения выводов.
-currentScriptName = str(__file__).split("/")[len(str(__file__).split("/"))-1]
+currentScriptName = pathlib.Path(__file__).name
 
 # 1. Определяем тип задачи.
 print('Task type: logistic regression or SVM')
