@@ -20,10 +20,10 @@ originalTrainDf = pd.read_csv(trainPath, index_col='ID')
 originalTestDf = pd.read_csv(testPath, index_col='ID')
 
 #Смотрим огригинальные датафреймы.
-prosmotr_dannih(originalTrainDf, currentScriptName, "originalTrainDf")
-prosmotr_dannih(originalTestDf, currentScriptName, "originalTestDf")
-poisk_dublikatov(originalTrainDf)
-poisk_dublikatov(originalTestDf)
+data_inspection(originalTrainDf, currentScriptName, "originalTrainDf")
+data_inspection(originalTestDf, currentScriptName, "originalTestDf")
+duplicate_search(originalTrainDf, 'originalTrainDf')
+duplicate_search(originalTestDf, 'originalTestDf')
 
 #
 # # Формируем датафреймы из псевдорандомных выборок.
