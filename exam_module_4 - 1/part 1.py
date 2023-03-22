@@ -36,30 +36,21 @@ cvDf = originalTrainDf.drop(trainDf.index).drop('mutation', axis=1)
 cvDfTarget = originalTrainDf.drop(trainDfTarget.index)[['mutation']]
 testDf = originalTestDf
 
-# 4. Если это необходимо провести препроцессинг данных, нужно ли применять алгоритмы понижения размерности?
-# Нужно ли убирать аномалии?
 separator_show("""4. Если это необходимо провести препроцессинг данных, нужно ли применять алгоритмы понижения размерности?
 Нужно ли убирать аномалии?""", type="large")
 
 # Переводим первые 9 столбцов в цифры (по методу one-hot, one-hot столбцы добавляются в конце датафрейма).
-dummieCounter = 0
-for col in trainDf.columns:
-    if trainDf[col].dtypes == object:
-        dummieCounter += len(trainDf[col].unique())
-        print('Unique in ' + str(col) + ': ' + str(len(trainDf[col].unique())))
-print('Dummie columns: ' + str(dummieCounter))
 
+unique_counter_for_object_type(trainDf, "trainDf")
 trainDf = pd.get_dummies(trainDf)
 cvDf = pd.get_dummies(cvDf)
 testDf = pd.get_dummies(testDf)
 
-# 5. Провести EDA и вывести какие-то умозаключения и посмотреть на распределения признаков, на корреляции, на выбросы.
+data_inspection(trainDf, currentScriptName, "trainDf")
+data_inspection(cvDf, currentScriptName, "cvDf")
+data_inspection(testDf, currentScriptName, "testDf")
 
-# 6. Подумать над вариантом модели, для того чтобы решить задачу (либо ансамблем моделей)
-
-print('Так как n << m, лучше использовать логистическую регрессию, либо SMV without kernel.')
-
-# 7. Подумать нужно ли применять Unsupervised learning подход для решения задачи?
-# Неоходима ли дополнительная информация?
-
-# 8. Обучить модель и вывести валидационный скор по метрике качества.
+# Сохраняем данные в csv.
+results_save(trainDf, currentScriptName, "trainDf")
+results_save(cvDf, currentScriptName, "cvDf")
+results_save(testDf, currentScriptName, "testDf")

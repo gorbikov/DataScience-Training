@@ -44,7 +44,20 @@ def duplicates_delete(df: pd.DataFrame, name: str):
 
 
 # Сохраняет датафрейм в виде csv в папку results.
-def intermediate_data_save(df: pd.DataFrame, current_script_name: str, filename: str):
+def results_save(df: pd.DataFrame, current_script_name: str, filename: str):
+    separator_show("Сохраняем датафрейм " + filename + "в csv")
     filepath = Path(str("results/" + current_script_name + "_" + filename + '.csv'))
     filepath.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(filepath)
+    print(filename + " сохранен в " + str(filepath))
+
+
+# Выбирает столбцы типа object, выводит количество уникальных записей в каждом таком столбце.
+def unique_counter_for_object_type(df: pd.DataFrame, name: str):
+    separator_show("Уникальные значения в столбцах типа object в " + name)
+    dummieCounter = 0
+    for col in df.columns:
+        if df[col].dtypes == object:
+            dummieCounter += len(df[col].unique())
+            print('Unique in ' + str(col) + ': ' + str(len(df[col].unique())))
+    print('Dummie columns: ' + str(dummieCounter))
