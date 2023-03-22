@@ -22,7 +22,7 @@ def separator_show(*args: str, type='small'):
 def data_inspection(df: pd.DataFrame, current_script_name: str, filename: str):
     separator_show("Информация по " + filename)
     df.info()
-    filepath = Path(str("intermediate data/" + current_script_name + "_" + filename + '.csv'))
+    filepath = Path(str("intermediate data/" + current_script_name + "_" + filename + '_head.csv'))
     filepath.parent.mkdir(parents=True, exist_ok=True)
     df.head().to_csv(filepath)
 
@@ -43,13 +43,12 @@ def duplicates_delete(df: pd.DataFrame, name: str):
     return df
 
 
-# Сохраняет датафрейм в виде csv в папку results.
-def results_save(df: pd.DataFrame, current_script_name: str, filename: str):
-    separator_show("Сохраняем датафрейм " + filename + "в csv")
-    filepath = Path(str("results/" + current_script_name + "_" + filename + '.csv'))
-    filepath.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(filepath)
-    print(filename + " сохранен в " + str(filepath))
+# Выводит матрицу корреляций для датафрейма + рисует столбчатый график.
+def correlation_with_target(df: pd.DataFrame, name: str, columnForCorrelation: str):
+    separator_show("Матрица корреляций для " + name + " со столбцом " + columnForCorrelation)
+    print(df.corr()[[columnForCorrelation]])
+    # TODO Добавить столбчатую диаграмму.
+    # TODO Добавить сохранение диаграммы в png.
 
 
 # Выбирает столбцы типа object, выводит количество уникальных записей в каждом таком столбце.
@@ -61,3 +60,12 @@ def unique_counter_for_object_type(df: pd.DataFrame, name: str):
             dummieCounter += len(df[col].unique())
             print('Unique in ' + str(col) + ': ' + str(len(df[col].unique())))
     print('Dummie columns: ' + str(dummieCounter))
+
+
+# Сохраняет датафрейм в виде csv в папку results.
+def results_save(df: pd.DataFrame, current_script_name: str, filename: str):
+    separator_show("Сохраняем датафрейм " + filename + " в csv")
+    filepath = Path(str("results/" + current_script_name + "_" + filename + '.csv'))
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(filepath)
+    print(filename + " сохранен в " + str(filepath))
