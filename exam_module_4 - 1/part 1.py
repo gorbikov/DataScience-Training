@@ -23,12 +23,16 @@ originalTestDf = pd.read_csv(testPath, index_col='ID')
 separator_show("3. Определить тип переменных в датасете.", size="large")
 # Смотрим оригинальные датафреймы.
 data_inspection(originalTrainCvDf, currentScriptName, "originalTrainCvDf")
-duplicates_search(originalTrainCvDf, "originalTrainCvDf")
-duplicates_delete(originalTrainCvDf, "originalTrainCvDf")
-
 data_inspection(originalTestDf, currentScriptName, "originalTestDf")
+
+# Ищем и удаляем дубликаты в оргигнальных данных.
+duplicates_search(originalTrainCvDf, "originalTrainCvDf")
+originalTrainCvDf = duplicates_delete(originalTrainCvDf, "originalTrainCvDf")
 duplicates_search(originalTestDf, "originalTestDf")
-duplicates_delete(originalTestDf, "originalTestDf")
+originalTestDf = duplicates_delete(originalTestDf, "originalTestDf")
+
+# Ищем аномалии.
+numerical_anomaly_show(originalTrainCvDf, "originalTrainCvDf", "K")
 
 separator_show("""4. Если это необходимо провести препроцессинг данных, нужно ли применять алгоритмы понижения
 размерности? Нужно ли убирать аномалии?""", size="large")
