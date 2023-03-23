@@ -8,7 +8,7 @@ currentScriptName = pathlib.Path(__file__).name
 # Вводные.
 trainPath = pathlib.Path()
 testPath = pathlib.Path()
-cvPath =pathlib.Path("results/part 1.py_cvDf.csv")
+cvPath =pathlib.Path("intermediate data/results/part 1.py_cvDf.csv")
 
 
 # 6. Подумать над вариантом модели, для того чтобы решить задачу (либо ансамблем моделей)

@@ -12,16 +12,16 @@ cvFraction = 0.15
 # Фиксируем рандом.
 randomCeed = 777
 
-separator_show('1. Определяем тип задачи.', type="large")
+separator_show('1. Определяем тип задачи.', size="large")
 print('Task type: logistic regression or SVM')
 
-separator_show("2. Создаём фреймы и выделяем часть датасета на CV.", type="large")
+separator_show("2. Создаём фреймы и выделяем часть датасета на CV.", size="large")
 # Формируем оригинальные датафреймы
 originalTrainCvDf = pd.read_csv(trainPath, index_col='ID')
 originalTestDf = pd.read_csv(testPath, index_col='ID')
 
-separator_show("3. Определить тип переменных в датасете.", type="large")
-# Смотрим огригинальные датафреймы.
+separator_show("3. Определить тип переменных в датасете.", size="large")
+# Смотрим оригинальные датафреймы.
 data_inspection(originalTrainCvDf, currentScriptName, "originalTrainCvDf")
 duplicates_search(originalTrainCvDf, "originalTrainCvDf")
 duplicates_delete(originalTrainCvDf, "originalTrainCvDf")
@@ -31,7 +31,7 @@ duplicates_search(originalTestDf, "originalTestDf")
 duplicates_delete(originalTestDf, "originalTestDf")
 
 separator_show("""4. Если это необходимо провести препроцессинг данных, нужно ли применять алгоритмы понижения
-размерности? Нужно ли убирать аномалии?""", type="large")
+размерности? Нужно ли убирать аномалии?""", size="large")
 
 # Переводим первые 9 столбцов в цифры (по методу one-hot, one-hot столбцы добавляются в конце датафрейма).
 unique_counter_for_object_type(originalTrainCvDf, "originalTrainCVDf")
@@ -40,11 +40,11 @@ trainCvDf = pd.get_dummies(originalTrainCvDf)
 testDf = pd.get_dummies(originalTestDf)
 
 separator_show("""5. Провести EDA и вывести какие-то умозаключения и посмотреть на распределения признаков, на
-корреляции, на выбросы.""", type='large')
+корреляции, на выбросы.""", size='large')
 
-correlation_with_target(trainCvDf, "trainCvDf", "mutation")
+correlation_with_target(trainCvDf, "trainCvDf", "mutation", currentScriptName)
 
-# Формируем датафреймы из псевдорандомных выборок.
+# Формируем датафреймы из псевдослучайных выборок.
 trainDf = trainCvDf.sample(frac=(1 - cvFraction), random_state=randomCeed).drop('mutation', axis=1)
 trainDfTarget = trainCvDf.sample(frac=(1 - cvFraction), random_state=randomCeed)[['mutation']]
 cvDf = trainCvDf.drop(trainDf.index).drop('mutation', axis=1)
