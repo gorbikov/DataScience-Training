@@ -36,18 +36,17 @@ show_nans(originalTestDf, "originalTestDf")
 
 # Ищем аномалии.
 columns = originalTrainCvDf.iloc[:, 9:19].columns.tolist()
-for columns in columns:
-    # TODO Нарисовать гистограмму.
-    pass
+for column in columns:
+    show_histogram(currentScriptName, originalTrainCvDf, "originalTrainCvDf", False, column)
+
+columns = originalTrainCvDf.iloc[:, 30:31].columns.tolist()
+for column in columns:
+    show_histogram(currentScriptName, originalTrainCvDf, "originalTrainCvDf", False, column)
 
 columns = originalTrainCvDf.iloc[:, 19:30].columns.tolist()
 for column in columns:
     show_boxplot(currentScriptName, originalTrainCvDf, "originalTrainCvDf", False, column)
     show_histogram(currentScriptName, originalTrainCvDf, "originalTrainCvDf", False, column)
-
-# Смотрим распределения.
-# TODO сделать распределения по дискретным.
-# TODO сделать распределения по плавным.
 
 show_separator("""4. Если это необходимо провести препроцессинг данных, нужно ли применять алгоритмы понижения
 размерности? Нужно ли убирать аномалии?""", size="large")
