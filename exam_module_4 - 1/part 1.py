@@ -1,5 +1,6 @@
 # Настраиваем импорты.
 import pathlib
+
 from eda import *
 
 # Получаем имя текущего скрипта для сохранения выводов.
@@ -12,41 +13,55 @@ cvFraction = 0.15
 # Фиксируем рандом.
 randomCeed = 777
 
-separator_show('1. Определяем тип задачи.', size="large")
+show_separator('1. Определяем тип задачи.', size="large")
 print('Task type: logistic regression or SVM')
 
-separator_show("2. Создаём фреймы и выделяем часть датасета на CV.", size="large")
+show_separator("2. Создаём фреймы и выделяем часть датасета на CV.", size="large")
 # Формируем оригинальные датафреймы
 originalTrainCvDf = pd.read_csv(trainPath, index_col='ID')
 originalTestDf = pd.read_csv(testPath, index_col='ID')
 
-separator_show("3. Определить тип переменных в датасете.", size="large")
+show_separator("3. Определить тип переменных в датасете.", size="large")
 # Смотрим оригинальные датафреймы.
-data_inspection(originalTrainCvDf, currentScriptName, "originalTrainCvDf")
-data_inspection(originalTestDf, currentScriptName, "originalTestDf")
+inspect_data(currentScriptName, originalTrainCvDf, "originalTrainCvDf")
+inspect_data(currentScriptName, originalTestDf, "originalTestDf")
 
-# Ищем и удаляем дубликаты в оргигнальных данных.
-duplicates_search(originalTrainCvDf, "originalTrainCvDf")
-originalTrainCvDf = duplicates_delete(originalTrainCvDf, "originalTrainCvDf")
-duplicates_search(originalTestDf, "originalTestDf")
-originalTestDf = duplicates_delete(originalTestDf, "originalTestDf")
+# Ищем и удаляем дубликаты в оригинальных данных.
+search_duplicates(originalTrainCvDf, "originalTrainCvDf")
+search_duplicates(originalTestDf, "originalTestDf")
+
+# Ищем незаполненные и некорректно заполненные данные.
+show_nans(originalTrainCvDf, "originalTrainCvDf")
+show_nans(originalTestDf, "originalTestDf")
 
 # Ищем аномалии.
-numerical_anomaly_show(originalTrainCvDf, "originalTrainCvDf", "K")
+columns = originalTrainCvDf.iloc[:, 9:19].columns.tolist()
+for columns in columns:
+    # TODO Нарисовать гистограмму.
+    pass
 
-separator_show("""4. Если это необходимо провести препроцессинг данных, нужно ли применять алгоритмы понижения
+columns = originalTrainCvDf.iloc[:, 19:30].columns.tolist()
+for column in columns:
+    show_boxplot(currentScriptName, originalTrainCvDf, "originalTrainCvDf", False, column)
+    show_histogram(currentScriptName, originalTrainCvDf, "originalTrainCvDf", False, column)
+
+# Смотрим распределения.
+# TODO сделать распределения по дискретным.
+# TODO сделать распределения по плавным.
+
+show_separator("""4. Если это необходимо провести препроцессинг данных, нужно ли применять алгоритмы понижения
 размерности? Нужно ли убирать аномалии?""", size="large")
 
 # Переводим первые 9 столбцов в цифры (по методу one-hot, one-hot столбцы добавляются в конце датафрейма).
-unique_counter_for_object_type(originalTrainCvDf, "originalTrainCVDf")
-unique_counter_for_object_type(originalTestDf, "originalTestDf")
+count_unique_for_object_type(originalTrainCvDf, "originalTrainCVDf")
+count_unique_for_object_type(originalTestDf, "originalTestDf")
 trainCvDf = pd.get_dummies(originalTrainCvDf)
 testDf = pd.get_dummies(originalTestDf)
 
-separator_show("""5. Провести EDA и вывести какие-то умозаключения и посмотреть на распределения признаков, на
+show_separator("""5. Провести EDA и вывести какие-то умозаключения и посмотреть на распределения признаков, на
 корреляции, на выбросы.""", size='large')
 
-correlation_with_target(trainCvDf, "trainCvDf", "mutation", currentScriptName)
+show_correlation_with_target(currentScriptName, trainCvDf, "trainCvDf", "mutation", False)
 
 # Формируем датафреймы из псевдослучайных выборок.
 trainDf = trainCvDf.sample(frac=(1 - cvFraction), random_state=randomCeed).drop('mutation', axis=1)
@@ -55,15 +70,15 @@ cvDf = trainCvDf.drop(trainDf.index).drop('mutation', axis=1)
 cvDfTarget = trainCvDf.drop(trainDfTarget.index)[['mutation']]
 
 # Просмотр данных перед сохранением.
-data_inspection(trainDf, currentScriptName, "trainDf")
-data_inspection(trainDfTarget, currentScriptName, "trainDfTarget")
-data_inspection(cvDf, currentScriptName, "cvDf")
-data_inspection(cvDfTarget, currentScriptName, "cvDfTarget")
-data_inspection(testDf, currentScriptName, "testDf")
+inspect_data(currentScriptName, trainDf, "trainDf")
+inspect_data(currentScriptName, trainDfTarget, "trainDfTarget")
+inspect_data(currentScriptName, cvDf, "cvDf")
+inspect_data(currentScriptName, cvDfTarget, "cvDfTarget")
+inspect_data(currentScriptName, testDf, "testDf")
 
 # Сохраняем данные в csv.
-results_save(trainDf, currentScriptName, "trainDf")
-results_save(trainDfTarget, currentScriptName, "trainDfTarget")
-results_save(cvDf, currentScriptName, "cvDf")
-results_save(cvDfTarget, currentScriptName, "cvDfTarget")
-results_save(testDf, currentScriptName, "testDf")
+save_results(currentScriptName, trainDf, "trainDf")
+save_results(currentScriptName, trainDfTarget, "trainDfTarget")
+save_results(currentScriptName, cvDf, "cvDf")
+save_results(currentScriptName, cvDfTarget, "cvDfTarget")
+save_results(currentScriptName, testDf, "testDf")

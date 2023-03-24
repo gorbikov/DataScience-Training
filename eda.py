@@ -1,10 +1,10 @@
 from pathlib import Path
 
-import matplotlib.pyplot
+import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def separator_show(*title_texts: str, size='small'):
+def show_separator(*title_texts: str, size='small'):
     # Выводит разделитель в виде штриховой линии.
     match size:
         case "small":
@@ -20,43 +20,55 @@ def separator_show(*title_texts: str, size='small'):
             print("===================================================================================================")
 
 
-def results_save(df: pd.DataFrame, current_script_name: str, filename: str):
+def save_results(current_script_name: str, df: pd.DataFrame, filename: str):
     # Сохраняет датафрейм в виде csv в папку intermediate data/results/.
-    separator_show("Сохраняем датафрейм " + filename + " в csv")
+    show_separator("Сохраняем датафрейм " + filename + " в csv")
     filepath = Path(str("intermediate data/results/" + current_script_name + "_" + filename + '.csv'))
     filepath.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(filepath)
     print(filename + " сохранен в " + str(filepath))
 
 
-def data_inspection(df: pd.DataFrame, current_script_name: str, filename: str):
+def inspect_data(current_script_name: str, df: pd.DataFrame, filename: str):
     # Выводит инфо, сохраняет голову датафрейма в csv в папку intermediate data/heads/.
-    separator_show("Информация по " + filename)
+    show_separator("Информация по " + filename)
     df.info()
     filepath = Path(str("intermediate data/heads/" + current_script_name + "_" + filename + '_head.csv'))
     filepath.parent.mkdir(parents=True, exist_ok=True)
     df.head().to_csv(filepath)
+    filepath = Path(str("intermediate data/heads/" + current_script_name + "_" + filename + '_describe.csv'))
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    df.describe().to_csv(filepath)
 
 
-def duplicates_search(df: pd.DataFrame, df_name: str):
+def search_duplicates(df: pd.DataFrame, df_name: str):
     # Выводит количество дубликатов в датафрейме.
-    separator_show("Поиск дубликатов в " + df_name)
+    show_separator("Поиск дубликатов в " + df_name)
     print("Количество дубликатов в " + df_name + ":")
     print(df[df.duplicated()].shape[0])
 
 
-def duplicates_delete(df: pd.DataFrame, df_name: str):
+def delete_duplicates(df: pd.DataFrame, df_name: str):
     # Удаляет дубликаты в датафрейме.
-    separator_show("Удаление дубликатов в " + df_name)
+    show_separator("Удаление дубликатов в " + df_name)
     print("Размер " + df_name + " до удаления дубликатов: " + str(df.shape))
-    df = df.drop_duplicates()
+    df: pd.DataFrame = df.drop_duplicates()
     print("Размер " + df_name + " после удаления дубликатов: " + str(df.shape))
     return df
 
 
-def unique_counter_for_object_type(df: pd.DataFrame, df_name: str):
+def show_nans(df: pd.DataFrame, df_name: str):
+    # Выводит количество пустых клеток в датафрейме.
+    show_separator("Поиск пустых клеток в " + df_name)
+    print("Количество строк с пустыми клетками в " + df_name + ":")
+    print(df[df.isnull().any(axis=1)].shape[0])
+    print("Количество столбцов с пустыми клетками в " + df_name + ":")
+    print(df.loc[:, df.isnull().any()].columns.size)
+
+
+def count_unique_for_object_type(df: pd.DataFrame, df_name: str):
     # Выбирает столбцы типа object, выводит количество уникальных записей в каждом таком столбце.
-    separator_show("Уникальные значения в столбцах типа object в " + df_name)
+    show_separator("Уникальные значения в столбцах типа object в " + df_name)
     dummy_counter = 0
     for col in df.columns:
         if df[col].dtypes == object:
@@ -65,30 +77,59 @@ def unique_counter_for_object_type(df: pd.DataFrame, df_name: str):
     print('Dummy columns: ' + str(dummy_counter))
 
 
-def correlation_with_target(df: pd.DataFrame, df_name: str, column_for_correlation: str, current_script_name: str):
-    # Выводит матрицу корреляций для датафрейма + рисует столбчатый график, сохраняет в папку intermediate data/diagrams/.
-    separator_show("Матрица корреляций для " + df_name + " со столбцом " + column_for_correlation)
+def show_boxplot(current_script_name: str, df: pd.DataFrame, df_name: str, show: bool, column_name: str):
+    # Выводит график с выбросами и сохраняет в папку "intermediate data/diagrams/".
+    show_separator("Распределение значений для столбца " + column_name + " в датафрейме " + df_name)
+    current_column = df[[column_name]]
+    plt.figure(figsize=(19.2, 10.8))
+    plt.boxplot(current_column)
+    plt.title("Распределение значений для столбца " + column_name + " в датафрейме " + df_name)
+    plt.grid()
+    plt.tight_layout()
+    filepath = Path(
+        str("intermediate data/diagrams/" + current_script_name + "_" + df_name + "_" + column_name + '_boxplot.png'))
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(filepath)
+    print("Сохранено в intermediate data/diagrams/")
+    if show:
+        plt.show()
+
+
+def show_histogram(current_script_name: str, df: pd.DataFrame, df_name: str, show: bool, column_name: str):
+    # Выводит гистограмму и сохраняет в папку "intermediate data/diagrams/".
+    show_separator("Распределение значений для столбца " + column_name + " в датафрейме " + df_name)
+    current_column = df[[column_name]]
+    plt.figure(figsize=(19.2, 10.8))
+    plt.hist(current_column, bins=100)
+    plt.title("Гистограмма для столбца " + column_name + " в датафрейме " + df_name)
+    plt.grid()
+    plt.tight_layout()
+    filepath = Path(
+        str("intermediate data/diagrams/" + current_script_name + "_" + df_name + "_" + column_name + '_histogram.png'))
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(filepath)
+    print("Сохранено в intermediate data/diagrams/")
+    if show:
+        plt.show()
+
+
+def show_correlation_with_target(current_script_name: str, df: pd.DataFrame, df_name: str, column_for_correlation: str,
+                                 show: bool):
+    # Выводит матрицу корреляций для датафрейма + рисует столбчатый график, сохраняет в папку intermediate
+    # data/diagrams/.
+    show_separator("Матрица корреляций для " + df_name + " со столбцом " + column_for_correlation)
     corr_df = df.corr()[[column_for_correlation]].drop(column_for_correlation, axis=0)
     print(corr_df.sort_values(by=[column_for_correlation], ascending=False))
+    plt.figure(figsize=(19.2, 10.8))
+
     x_axis = corr_df.index.values
-    y_axis = corr_df[[column_for_correlation]].values
-
-    # TODO Передалать графики на fig. Добавить тайтл.
-    fig = matplotlib.pyplot.bar(x_axis, y_axis)
-
-    # df.corr()[[column_for_correlation]].drop(column_for_correlation, axis=0) \
-    #     .plot(y=[column_for_correlation], kind="bar")
-    matplotlib.pyplot.show()
-
+    y_axis = corr_df[[column_for_correlation]].values.reshape(x_axis.shape[0])
+    plt.barh(x_axis, y_axis)
+    plt.title("Матрица корреляций для " + df_name + " со столбцом " + column_for_correlation)
+    plt.grid()
+    plt.tight_layout()
     filepath = Path(str("intermediate data/diagrams/" + current_script_name + "_" + df_name + '.png'))
     filepath.parent.mkdir(parents=True, exist_ok=True)
-    matplotlib.pyplot.savefig(filepath)
-
-
-def numerical_anomaly_show(df: pd.DataFrame, df_name: str, *column_names: str):
-    for column_name in column_names:
-        separator_show("Распределение значений для столбца " + column_name + " в датафрейме " + df_name)
-        current_column = df[[column_name]]
-        matplotlib.pyplot.boxplot(current_column)
-        matplotlib.pyplot.show()
-        # TODO Передалать графики на fig. Добавить тайтл. Добавить сохранение.
+    plt.savefig(filepath)
+    if show:
+        plt.show()
