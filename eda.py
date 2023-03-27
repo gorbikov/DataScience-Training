@@ -77,7 +77,7 @@ def count_unique_for_object_type(df: pd.DataFrame, df_name: str):
     print('Dummy columns: ' + str(dummy_counter))
 
 
-def show_boxplot(current_script_name: str, df: pd.DataFrame, df_name: str, show: bool, column_name: str):
+def show_boxplot(current_script_name: str, df: pd.DataFrame, df_name: str, column_name: str):
     # Выводит график с выбросами и сохраняет в папку "intermediate data/diagrams/".
     show_separator("Распределение значений для столбца " + column_name + " в датафрейме " + df_name)
     current_column = df[[column_name]]
@@ -91,11 +91,10 @@ def show_boxplot(current_script_name: str, df: pd.DataFrame, df_name: str, show:
     filepath.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(filepath)
     print("Сохранено в intermediate data/diagrams/")
-    if show:
-        plt.show()
+    plt.close()
 
 
-def show_histogram(current_script_name: str, df: pd.DataFrame, df_name: str, show: bool, column_name: str):
+def show_histogram(current_script_name: str, df: pd.DataFrame, df_name: str, column_name: str):
     # Выводит гистограмму и сохраняет в папку "intermediate data/diagrams/".
     show_separator("Распределение значений для столбца " + column_name + " в датафрейме " + df_name)
     current_column = df[[column_name]]
@@ -109,12 +108,10 @@ def show_histogram(current_script_name: str, df: pd.DataFrame, df_name: str, sho
     filepath.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(filepath)
     print("Сохранено в intermediate data/diagrams/")
-    if show:
-        plt.show()
+    plt.close()
 
 
-def show_correlation_with_target(current_script_name: str, df: pd.DataFrame, df_name: str, column_for_correlation: str,
-                                 show: bool):
+def show_correlation_with_target(current_script_name: str, df: pd.DataFrame, df_name: str, column_for_correlation: str):
     # Выводит матрицу корреляций для датафрейма + рисует столбчатый график, сохраняет в папку intermediate
     # data/diagrams/.
     show_separator("Матрица корреляций для " + df_name + " со столбцом " + column_for_correlation)
@@ -131,5 +128,4 @@ def show_correlation_with_target(current_script_name: str, df: pd.DataFrame, df_
     filepath = Path(str("intermediate data/diagrams/" + current_script_name + "_" + df_name + '.png'))
     filepath.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(filepath)
-    if show:
-        plt.show()
+    plt.close()

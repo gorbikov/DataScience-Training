@@ -37,16 +37,16 @@ show_nans(originalTestDf, "originalTestDf")
 # Ищем аномалии.
 columns = originalTrainCvDf.iloc[:, 9:19].columns.tolist()
 for column in columns:
-    show_histogram(currentScriptName, originalTrainCvDf, "originalTrainCvDf", False, column)
+    show_histogram(currentScriptName, originalTrainCvDf, "originalTrainCvDf", column)
 
 columns = originalTrainCvDf.iloc[:, 30:31].columns.tolist()
 for column in columns:
-    show_histogram(currentScriptName, originalTrainCvDf, "originalTrainCvDf", False, column)
+    show_histogram(currentScriptName, originalTrainCvDf, "originalTrainCvDf", column)
 
 columns = originalTrainCvDf.iloc[:, 19:30].columns.tolist()
 for column in columns:
-    show_boxplot(currentScriptName, originalTrainCvDf, "originalTrainCvDf", False, column)
-    show_histogram(currentScriptName, originalTrainCvDf, "originalTrainCvDf", False, column)
+    show_boxplot(currentScriptName, originalTrainCvDf, "originalTrainCvDf", column)
+    show_histogram(currentScriptName, originalTrainCvDf, "originalTrainCvDf", column)
 
 show_separator("""4. Если это необходимо провести препроцессинг данных, нужно ли применять алгоритмы понижения
 размерности? Нужно ли убирать аномалии?""", size="large")
@@ -60,7 +60,7 @@ testDf = pd.get_dummies(originalTestDf)
 show_separator("""5. Провести EDA и вывести какие-то умозаключения и посмотреть на распределения признаков, на
 корреляции, на выбросы.""", size='large')
 
-show_correlation_with_target(currentScriptName, trainCvDf, "trainCvDf", "mutation", False)
+show_correlation_with_target(currentScriptName, trainCvDf, "trainCvDf", "mutation")
 
 # Формируем датафреймы из псевдослучайных выборок.
 trainDf = trainCvDf.sample(frac=(1 - cvFraction), random_state=randomCeed).drop('mutation', axis=1)
