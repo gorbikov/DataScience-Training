@@ -1,7 +1,7 @@
 from pathlib import Path
 
-import matplotlib
-import matplotlib.pyplot
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 import matplotlib.figure
 import matplotlib.axes
 import matplotlib.patches
@@ -85,39 +85,100 @@ def count_unique_for_object_type(df: pd.DataFrame, df_name: str):
 
 def generate_boxplot(current_script_name: str, df: pd.DataFrame, df_name: str, column_name: str):
     """Сохраняет график с выбросами в папку "intermediate data/diagrams/."""
+
+    # Выводит разделитель с описанием того, что делает функция.
     show_separator("Распределение значений для столбца " + column_name + " в датафрейме " + df_name)
+
+    # Выбирает столбец для анализа.
     current_column = df[[column_name]]
-    plt = matplotlib.pyplot()
-    plt.figure(figsize=(19.2, 10.8))
-    plt.boxplot(current_column)
-    plt.title("Распределение значений для столбца " + column_name + " в датафрейме " + df_name)
-    plt.grid()
+
+    # Создаёт фигуру, оси и решетку.
+    fig: matplotlib.figure.Figure = plt.figure()
+    ax: matplotlib.axes.Axes = plt.axes()
+    fig.set_size_inches(w=19.2, h=10.8)
+    ax.grid()
+
+    # Рисует график.
+    ax.set_title("Распределение значений для столбца " + column_name + " в датафрейме " + df_name)
+    ax.boxplot(current_column)
+
+    # Добавляет подписи данных.
     # TODO добавить подписи данных.
+    graph_patches = ax.patches
+    for patch in graph_patches:
+        x = patch.get_x()
+        y = patch.get_y()
+        w = patch.get_width()
+        h = patch.get_height()
+        show_separator("Patches")
+        print(x)
+        print(y)
+        print(w)
+        print(h)
+
+
+
+
+
+
+    # Регулирует отступы на графике.
     plt.tight_layout()
+
+    # Сохраняет график в файл.
     filepath = Path(
         str("intermediate data/diagrams/" + current_script_name + "_" + df_name + "_" + column_name + '_boxplot.png'))
     filepath.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(filepath)
     print("Сохранено в intermediate data/diagrams/")
+
+
+    # Убирает фигуру из памяти и закрывает график.
+    fig.clear()
     plt.close()
 
 
 def generate_histogram(current_script_name: str, df: pd.DataFrame, df_name: str, column_name: str):
     """Сохраняет гистограмму в папку "intermediate data/diagrams/."""
+
+    # Выводит разделитель с описанием того, что делает функция.
     show_separator("Распределение значений для столбца " + column_name + " в датафрейме " + df_name)
+
+    # Выбирает столбец для анализа.
     current_column = df[[column_name]]
-    plt = matplotlib.pyplot()
-    plt.figure(figsize=(19.2, 10.8))
-    plt.hist(current_column, bins=100)
-    plt.title("Гистограмма для столбца " + column_name + " в датафрейме " + df_name)
-    plt.grid()
-    # TODO добавить подписи данных.
+
+    # Создаёт фигуру, оси и решетку.
+    fig: matplotlib.figure.Figure = plt.figure()
+    ax: matplotlib.axes.Axes = plt.axes()
+    fig.set_size_inches(w=19.2, h=10.8)
+    ax.grid()
+
+    # Рисует график.
+    ax.set_title("Гистограмма для столбца " + column_name + " в датафрейме " + df_name)
+    ax.hist(x=current_column, bins=50)
+
+    # Добавляет подписи данных.
+    graph_patches = ax.patches
+    x_pos = np.arange(len(graph_patches))
+    for patch, value in zip(graph_patches, x_pos):
+        patch: matplotlib.patches.Rectangle = patch
+        width = patch.get_width()
+        height = patch.get_height()
+        if height != 0:
+            ax.text(patch.get_x() + width / 2, patch.get_height() / 2, round(height, 2), horizontalalignment='center',
+                bbox={'facecolor': 'grey', 'edgecolor': 'None', 'alpha': 0.5, 'pad': 0.3})
+
+    # Регулирует отступы на графике.
     plt.tight_layout()
+
+    # Сохраняет график в файл.
     filepath = Path(
         str("intermediate data/diagrams/" + current_script_name + "_" + df_name + "_" + column_name + '_histogram.png'))
     filepath.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(filepath)
     print("Сохранено в intermediate data/diagrams/")
+
+    # Убирает фигуру из памяти и закрывает график.
+    fig.clear()
     plt.close()
 
 
@@ -137,8 +198,8 @@ def generate_correlation_with_target(current_script_name: str, df: pd.DataFrame,
     plt_values = corr_df[[column_for_correlation]].values.reshape(plt_labels.shape[0])
 
     # Создаёт фигуру, оси и решетку.
-    fig: matplotlib.figure.Figure = matplotlib.pyplot.figure()
-    ax: matplotlib.axes.Axes = matplotlib.pyplot.axes()
+    fig: matplotlib.figure.Figure = plt.figure()
+    ax: matplotlib.axes.Axes = plt.axes()
     fig.set_size_inches(w=19.2, h=10.8)
     ax.grid()
 
@@ -157,13 +218,14 @@ def generate_correlation_with_target(current_script_name: str, df: pd.DataFrame,
                 bbox={'facecolor': 'grey','edgecolor':'None', 'alpha': 0.5, 'pad': 0.3})
 
     # Регулирует отступы на графике.
-    matplotlib.pyplot.tight_layout()
+    plt.tight_layout()
 
     # Сохраняет график в файл.
     filepath = Path(str("intermediate data/diagrams/" + current_script_name + "_" + df_name + '_correlation.png'))
     filepath.parent.mkdir(parents=True, exist_ok=True)
-    matplotlib.pyplot.savefig(filepath)
+    plt.savefig(filepath)
+    print("Сохранено в intermediate data/diagrams/")
 
     # Убирает фигуру из памяти и закрывает график.
     fig.clear()
-    matplotlib.pyplot.close()
+    plt.close()
