@@ -100,26 +100,13 @@ def generate_boxplot(current_script_name: str, df: pd.DataFrame, df_name: str, c
 
     # Рисует график.
     ax.set_title("Распределение значений для столбца " + column_name + " в датафрейме " + df_name)
-    ax.boxplot(current_column)
+    ax.boxplot(current_column, showmeans=True)
 
-    # Добавляет подписи данных.
-    # TODO добавить подписи данных.
-    graph_patches = ax.patches
-    for patch in graph_patches:
-        x = patch.get_x()
-        y = patch.get_y()
-        w = patch.get_width()
-        h = patch.get_height()
-        show_separator("Patches")
-        print(x)
-        print(y)
-        print(w)
-        print(h)
-
-
-
-
-
+    # Добавляет статистику на график.
+    xmin, xmax = ax.get_xlim()
+    ymin, ymax = ax.get_ylim()
+    ax.text(xmin + (xmax - xmin)/100, ymin + (ymax-ymin)/100 , str(df[[column_name]].describe()),
+            bbox={'facecolor': 'grey', 'edgecolor': 'None', 'alpha': 0.5, 'pad': 0.3})
 
     # Регулирует отступы на графике.
     plt.tight_layout()
