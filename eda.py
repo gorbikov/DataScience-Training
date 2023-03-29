@@ -87,7 +87,7 @@ def generate_boxplot(current_script_name: str, df: pd.DataFrame, df_name: str, c
     """Сохраняет график с выбросами в папку "intermediate data/diagrams/."""
 
     # Выводит разделитель с описанием того, что делает функция.
-    show_separator("Распределение значений для столбца " + column_name + " в датафрейме " + df_name)
+    show_separator("Боксплот для столбца " + column_name + " в датафрейме " + df_name)
 
     # Выбирает столбец для анализа.
     current_column = df[[column_name]]
@@ -103,9 +103,9 @@ def generate_boxplot(current_script_name: str, df: pd.DataFrame, df_name: str, c
     ax.boxplot(current_column, showmeans=True)
 
     # Добавляет статистику на график.
-    xmin, xmax = ax.get_xlim()
-    ymin, ymax = ax.get_ylim()
-    ax.text(xmin + (xmax - xmin)/100, ymin + (ymax-ymin)/100 , str(df[[column_name]].describe()),
+    x_min, x_max = ax.get_xlim()
+    y_min, y_max = ax.get_ylim()
+    ax.text(x_min + (x_max - x_min) / 100, y_min + (y_max - y_min) / 100, str(df[[column_name]].describe()),
             bbox={'facecolor': 'grey', 'edgecolor': 'None', 'alpha': 0.5, 'pad': 0.3})
 
     # Регулирует отступы на графике.
@@ -118,17 +118,16 @@ def generate_boxplot(current_script_name: str, df: pd.DataFrame, df_name: str, c
     plt.savefig(filepath)
     print("Сохранено в intermediate data/diagrams/")
 
-
     # Убирает фигуру из памяти и закрывает график.
     fig.clear()
     plt.close()
 
 
-def generate_histogram(current_script_name: str, df: pd.DataFrame, df_name: str, column_name: str):
+def generate_histogram(current_script_name: str, df: pd.DataFrame, df_name: str, column_name: str, bins: int = 50):
     """Сохраняет гистограмму в папку "intermediate data/diagrams/."""
 
     # Выводит разделитель с описанием того, что делает функция.
-    show_separator("Распределение значений для столбца " + column_name + " в датафрейме " + df_name)
+    show_separator("Гистограмма для столбца " + column_name + " в датафрейме " + df_name)
 
     # Выбирает столбец для анализа.
     current_column = df[[column_name]]
@@ -141,7 +140,7 @@ def generate_histogram(current_script_name: str, df: pd.DataFrame, df_name: str,
 
     # Рисует график.
     ax.set_title("Гистограмма для столбца " + column_name + " в датафрейме " + df_name)
-    ax.hist(x=current_column, bins=50)
+    ax.hist(x=current_column, bins=bins)
 
     # Добавляет подписи данных.
     graph_patches = ax.patches
@@ -152,7 +151,7 @@ def generate_histogram(current_script_name: str, df: pd.DataFrame, df_name: str,
         height = patch.get_height()
         if height != 0:
             ax.text(patch.get_x() + width / 2, patch.get_height() / 2, round(height, 2), horizontalalignment='center',
-                bbox={'facecolor': 'grey', 'edgecolor': 'None', 'alpha': 0.5, 'pad': 0.3})
+                    bbox={'facecolor': 'grey', 'edgecolor': 'None', 'alpha': 0.5, 'pad': 0.3})
 
     # Регулирует отступы на графике.
     plt.tight_layout()
@@ -201,8 +200,8 @@ def generate_correlation_with_target(current_script_name: str, df: pd.DataFrame,
     for patch, value in zip(graph_patches, plt_values):
         patch: matplotlib.patches.Rectangle = patch
         width = patch.get_width()
-        ax.text(width/2, patch.get_y()+patch.get_height()/2, round(value, 2), verticalalignment='center',
-                bbox={'facecolor': 'grey','edgecolor':'None', 'alpha': 0.5, 'pad': 0.3})
+        ax.text(width / 2, patch.get_y() + patch.get_height() / 2, round(value, 2), verticalalignment='center',
+                bbox={'facecolor': 'grey', 'edgecolor': 'None', 'alpha': 0.5, 'pad': 0.3})
 
     # Регулирует отступы на графике.
     plt.tight_layout()
