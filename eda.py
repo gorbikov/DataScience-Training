@@ -1,10 +1,9 @@
 from pathlib import Path
 
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import matplotlib.figure
 import matplotlib.axes
+import matplotlib.figure
 import matplotlib.patches
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
@@ -37,10 +36,13 @@ def save_results(current_script_name: str, df: pd.DataFrame, filename: str):
 def inspect_data(current_script_name: str, df: pd.DataFrame, filename: str):
     """Выводит инфо, сохраняет голову датафрейма в csv в папку intermediate data/heads/."""
     show_separator("Информация по " + filename)
+    # Выводит инфо.
     df.info()
+    # Сохраняет голову в файл.
     filepath = Path(str("intermediate data/heads/" + current_script_name + "_" + filename + '_head.csv'))
     filepath.parent.mkdir(parents=True, exist_ok=True)
     df.head().to_csv(filepath)
+    # Сохраняет статистику в файл.
     filepath = Path(str("intermediate data/heads/" + current_script_name + "_" + filename + '_describe.csv'))
     filepath.parent.mkdir(parents=True, exist_ok=True)
     df.describe().to_csv(filepath)

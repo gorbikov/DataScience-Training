@@ -2,12 +2,13 @@ name: DataScience
 channels:
   - defaults
 dependencies:
+  - seaborn
+  - scikit-learn
+  - missingno
   - numpy
+  - jupyter
   - pytorch
   - pandas
-  - jupyter
   - matplotlib
-  - scikit-learn
-  - seaborn
-  - missingno
-prefix: /home/pest/miniconda3/envs/DataScience
+  - joblib
+prefix: C:\Users\denis\miniconda3\envs\DataScience
