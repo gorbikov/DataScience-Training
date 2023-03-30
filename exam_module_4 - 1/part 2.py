@@ -1,5 +1,7 @@
 # Настраиваем импорты.
 import pathlib
+import torch
+import torch.nn
 
 from sklearn.preprocessing import StandardScaler
 from joblib import dump
@@ -51,6 +53,41 @@ filepath.parent.mkdir(parents=True, exist_ok=True)
 dump(scaler, filepath, compress=True)
 
 # TODO Собрать модель логистической регрессии.
+# Создаём тензоры из датафреймов.
+train_tensor: torch.Tensor = torch.Tensor(train_df.drop(['ID'], axis=1).values)
+train_target_tensor: torch.Tensor = torch.Tensor(train_target_df.drop(['ID'], axis=1).values)
+
+
+class LogisticRegression(torch.nn.Module):
+    def __init__(self, n_input_features):
+        super(LogisticRegression, self).__init__()
+        self.linear = torch.nn.Linear(n_input_features, 1)
+
+    # sigmoid transformation of the input
+    def forward(self, x):
+        y_pred = torch.sigmoid(self.linear(x))
+        return y_pred
+
+
+lr = LogisticRegression(train_tensor.size()[1])
+
+num_epochs = 500
+learning_rate = 0.01
+# Использует Binary Cross Entropy.
+criterion = torch.nn.BCELoss()
+# Использует ADAM optimizer.
+optimizer = torch.optim.SGD(lr.parameters(), lr=learning_rate)
+
+for epoch in range(num_epochs):
+    y_pred = lr(train_tensor)
+    loss = criterion(y_pred, train_target_tensor)
+    loss.backward()
+    optimizer.step()
+    optimizer.zero_grad()
+    if (epoch + 1) % 20 == 0:
+        # printing loss values on every 10 epochs to keep track
+        print(f'epoch: {epoch + 1}, loss = {loss.item():.4f}')
+
 # TODO Обучить модель
 # TODO Нормализовать тестовые данные.
 # TODO Получить результат.
