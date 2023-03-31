@@ -52,12 +52,14 @@ filepath = Path(str("intermediate data/results/" + current_script_name + "_scale
 filepath.parent.mkdir(parents=True, exist_ok=True)
 dump(scaler, filepath, compress=True)
 
-# TODO Собрать модель логистической регрессии.
-# Создаём тензоры из датафреймов.
+# Создаёт тензоры из датафреймов.
+cv_tensor: torch.Tensor = torch.Tensor(cv_df.drop(['ID'], axis=1).values)
+cv_target_tensor: torch.Tensor = torch.Tensor(cv_target_df.drop(['ID'], axis=1).values)
+test_tensor: torch.Tensor = torch.Tensor(test_df.drop(['ID'], axis=1).values)
 train_tensor: torch.Tensor = torch.Tensor(train_df.drop(['ID'], axis=1).values)
 train_target_tensor: torch.Tensor = torch.Tensor(train_target_df.drop(['ID'], axis=1).values)
 
-
+# Собирает модель логистической регрессии.
 class LogisticRegression(torch.nn.Module):
     def __init__(self, n_input_features):
         super(LogisticRegression, self).__init__()
@@ -71,7 +73,8 @@ class LogisticRegression(torch.nn.Module):
 
 lr = LogisticRegression(train_tensor.size()[1])
 
-num_epochs = 500
+# Начинает обучение.
+num_epochs = 10000
 learning_rate = 0.01
 # Использует Binary Cross Entropy.
 criterion = torch.nn.BCELoss()
@@ -88,8 +91,13 @@ for epoch in range(num_epochs):
         # printing loss values on every 10 epochs to keep track
         print(f'epoch: {epoch + 1}, loss = {loss.item():.4f}')
 
-# TODO Обучить модель
+# TODO Сделать сохранение результатов обучения в файл и загрузку их в начале обучения из этого файла.
 # TODO Нормализовать тестовые данные.
+with torch.no_grad():
+    target_predicted = lr(cv_tensor)
+    target_predicted_class = target_predicted.round()
+    acc = target_predicted_class.eq(cv_target_tensor).sum() / float(cv_target_tensor.shape[0])
+    print(f'accuracy: {acc.item():.4f}')
 # TODO Получить результат.
 # TODO Проверить результат на CV.
 # TODO Проверить результат на тесте (хотя бы на уровне сравнение корреляций).
