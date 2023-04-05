@@ -84,8 +84,8 @@ class LogisticRegression(torch.nn.Module):
 lr = LogisticRegression(train_tensor.size()[1])
 
 # Задаёт параметры обучения.
-num_epochs = 1000
-learning_rate = 0.11
+num_epochs = 10000
+learning_rate = 0.01
 # Использует Binary Cross Entropy.
 criterion = torch.nn.BCELoss()
 # Использует ADAM optimizer.
@@ -101,17 +101,21 @@ else:
 # Начинает обучение.
 show_separator("Обучение модели на " + str(num_epochs) + " эпохах:")
 loss_function_values_for_graph = dict()
+previous_loss_function_value = None
 for epoch in range(num_epochs):
     y_pred = lr(train_tensor)
     loss = criterion(y_pred, train_target_tensor)
     loss.backward()
     optimizer.step()
     optimizer.zero_grad()
-    if (epoch + 1) % 20 == 0:
+    if (epoch + 1) % 100 == 0:
         # Выводит loss function каждый 20 эпох.
-        # TODO Рисует график для loss function.
         loss_function_values_for_graph[epoch + 1] = loss.item()
         print(f'epoch: {epoch + 1}, loss = {loss.item():.4f}')
+    if (previous_loss_function_value is not None) and (float(loss.item()) > previous_loss_function_value):
+        show_separator("!!!Обучение остановлено, т.к. зафиксирован рост lost function.!!!")
+        break
+    previous_loss_function_value = float(loss.item())
 
 # Сохраняет в файл график loss function.
 generate_loss_function_graph(current_script_name, loss_function_values_for_graph)
