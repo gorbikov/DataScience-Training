@@ -170,6 +170,58 @@ def generate_histogram(current_script_name: str, df: pd.DataFrame, df_name: str,
     plt.close()
 
 
+def generate_loss_fuction_graph (current_script_name: str, data: dict):
+    """Сохраняет график loss function в папку intermediate data/diagrams/."""
+
+    # Выводит разделитель с описанием того, что делает функция.
+    show_separator("Сохраняем график loss function в папку intermediate data/diagrams/.")
+
+
+    # Создаёт фигуру, оси и решетку.
+    fig: matplotlib.figure.Figure = plt.figure()
+    ax: matplotlib.axes.Axes = plt.axes()
+    fig.set_size_inches(w=19.2, h=10.8)
+    ax.grid()
+
+    # Рисует график.
+    ax.set_title("График loss function в процессе обучения.")
+    ax.plot(data.keys(), data.values())
+
+
+
+
+
+    # Добавляет подписи данных.
+    for key in data.keys():
+        ax.text(key, data[key], round(data[key]), 5)
+
+
+
+
+    # graph_patches = ax.patches
+    # x_pos = np.arange(len(graph_patches))
+    # for patch, value in zip(graph_patches, x_pos):
+    #     patch: matplotlib.patches.Rectangle = patch
+    #     width = patch.get_width()
+    #     height = patch.get_height()
+    #     if height != 0:
+    #         ax.text(patch.get_x() + width / 2, patch.get_height() / 2, round(height, 2), horizontalalignment='center',
+    #                 bbox={'facecolor': 'grey', 'edgecolor': 'None', 'alpha': 0.5, 'pad': 0.3})
+
+    # Регулирует отступы на графике.
+    plt.tight_layout()
+
+    # Сохраняет график в файл.
+    filepath = Path(
+        str("intermediate data/diagrams/" + current_script_name + '_loss_function.png'))
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(filepath)
+    print("Сохранено в intermediate data/diagrams/")
+
+    # Убирает фигуру из памяти и закрывает график.
+    fig.clear()
+    plt.close()
+
 def generate_correlation_with_target(current_script_name: str, df: pd.DataFrame, df_name: str,
                                      column_for_correlation: str):
     """Выводит матрицу корреляций для датафрейма + сохраняет столбчатый график в папку intermediate data/diagrams/."""
