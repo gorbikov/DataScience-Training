@@ -77,14 +77,14 @@ class LogisticRegression(torch.nn.Module):
 
     # sigmoid transformation of the input
     def forward(self, x):
-        y_pred = torch.sigmoid(self.linear(x))
-        return y_pred
+        y_prediction = torch.sigmoid(self.linear(x))
+        return y_prediction
 
 
 lr = LogisticRegression(train_tensor.size()[1])
 
 # Задаёт параметры обучения.
-num_epochs = 100
+num_epochs = 1000
 learning_rate = 0.11
 # Использует Binary Cross Entropy.
 criterion = torch.nn.BCELoss()
@@ -114,7 +114,7 @@ for epoch in range(num_epochs):
         print(f'epoch: {epoch + 1}, loss = {loss.item():.4f}')
 
 # Сохраняет в файл график loss function.
-generate_loss_fuction_graph(current_script_name, loss_function_values_for_graph)
+generate_loss_function_graph(current_script_name, loss_function_values_for_graph)
 
 # Сохраняет параметры модели в файл.
 torch.save(lr.state_dict(), results_folder_path.joinpath(current_script_name + '_model_weights'))

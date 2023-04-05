@@ -170,7 +170,7 @@ def generate_histogram(current_script_name: str, df: pd.DataFrame, df_name: str,
     plt.close()
 
 
-def generate_loss_fuction_graph(current_script_name: str, data: dict):
+def generate_loss_function_graph(current_script_name: str, data: dict):
     """Сохраняет график loss function в папку intermediate data/diagrams/."""
 
     # Выводит разделитель с описанием того, что делает функция.
@@ -188,7 +188,7 @@ def generate_loss_fuction_graph(current_script_name: str, data: dict):
 
     # Добавляет подписи данных.
     for key in data.keys():
-        ax.text(key, data[key], round(float(data[key]), 5), horizontalalignment='center',
+        ax.text(key, data[key], str(round(data[key], 5)), horizontalalignment='center',
                 bbox={'facecolor': 'grey', 'edgecolor': 'None', 'alpha': 0.5, 'pad': 0.3})
 
     # Регулирует отступы на графике.
