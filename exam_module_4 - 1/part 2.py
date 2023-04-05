@@ -84,7 +84,7 @@ class LogisticRegression(torch.nn.Module):
 lr = LogisticRegression(train_tensor.size()[1])
 
 # Задаёт параметры обучения.
-num_epochs = 10000
+num_epochs = 100
 learning_rate = 0.11
 # Использует Binary Cross Entropy.
 criterion = torch.nn.BCELoss()
