@@ -39,10 +39,10 @@ if path.exists(results_folder_path.joinpath(current_script_name + '_train_norm_d
         and path.exists(results_folder_path.joinpath(current_script_name + '_cv_norm_df.csv')) \
         and path.exists(results_folder_path.joinpath(current_script_name + '_test_norm_df.csv')):
     # Вводные.
-    cv_norm_path = pathlib.Path("intermediate data/results/part 1.py_cv_norm_df.csv")
+    cv_norm_path = results_folder_path.joinpath(current_script_name + '_cv_norm_df.csv')
     cv_target_path = pathlib.Path("intermediate data/results/part 1.py_cv_df_target.csv")
-    test_norm_path = pathlib.Path("intermediate data/results/part 1.py_test_norm_df.csv")
-    train_norm_path = pathlib.Path("intermediate data/results/part 1.py_train_norm_df.csv")
+    test_norm_path = results_folder_path.joinpath(current_script_name + '_test_norm_df.csv')
+    train_norm_path = results_folder_path.joinpath(current_script_name + '_train_norm_df.csv')
     train_target_path = pathlib.Path("intermediate data/results/part 1.py_train_df_target.csv")
 
     # Создаёт датафреймы.
@@ -116,7 +116,7 @@ lr = LogisticRegression(train_norm_tensor.size()[1])
 
 # Задаёт параметры обучения.
 num_epochs = 1000
-learning_rate = 0.001
+learning_rate = 0.01
 # Использует Binary Cross Entropy.
 criterion = torch.nn.BCELoss()
 # Использует ADAM optimizer.
