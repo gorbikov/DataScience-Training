@@ -1,15 +1,13 @@
 # Настраиваем импорты.
 import pathlib
-import pandas as pd
 from os import path
 
 import torch
 import torch.nn
-
-from sklearn.preprocessing import StandardScaler
+from joblib import dump
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
-from joblib import dump
+from sklearn.preprocessing import StandardScaler
 
 from eda import *
 
@@ -24,56 +22,6 @@ results_folder_path.mkdir(parents=True, exist_ok=True)
 # Получаем имя текущего скрипта для сохранения выводов.
 current_script_name = pathlib.Path(__file__).name
 
-# Вводные.
-cv_path = pathlib.Path("intermediate data/results/part 1.py_cv_df.csv")
-cv_target_path = pathlib.Path("intermediate data/results/part 1.py_cv_df_target.csv")
-test_path = pathlib.Path("intermediate data/results/part 1.py_test_df.csv")
-train_path = pathlib.Path("intermediate data/results/part 1.py_train_df.csv")
-train_target_path = pathlib.Path("intermediate data/results/part 1.py_train_df_target.csv")
-
-# Создаёт датафреймы.
-cv_df = pd.read_csv(cv_path, index_col='ID')
-cv_target_df = pd.read_csv(cv_target_path, index_col='ID')
-test_df = pd.read_csv(test_path, index_col='ID')
-train_df = pd.read_csv(train_path, index_col='ID')
-train_target_df = pd.read_csv(train_target_path, index_col='ID')
-
-
-
-
-
-
-
-
-
-
-
-# Добавляем новые фичи на основе имеющихся.
-for column1 in train_df.loc[:, "A":"U"].columns:
-    for column2 in train_df.loc[:, "A":"U"].columns:
-        new_column = {column1 + "*" + column2: train_df[column1] * train_df[column2]}
-        new_column = pd.DataFrame(new_column)
-        train_df = pd.concat([train_df, new_column], axis=1)
-        print(column1 + "*" + column2 + " Train DONE!")
-
-        new_column = {column1 + "*" + column2: cv_df[column1] * cv_df[column2]}
-        new_column = pd.DataFrame(new_column)
-        cv_df = pd.concat([cv_df, new_column], axis=1)
-        print(column1 + "*" + column2 + " CV DONE!")
-
-
-train_df.head().to_csv(tmp_folder_path.joinpath("train.csv"))
-cv_df.head().to_csv(tmp_folder_path.joinpath("cv.csv"))
-
-
-
-
-
-
-
-
-
-
 show_separator("6. Подумать над вариантом модели, для того чтобы решить задачу (либо ансамблем моделей)",
                size="large")
 print('Так как n << m, лучше использовать логистическую регрессию, либо SMV without kernel.'
@@ -85,25 +33,71 @@ print("Применять ансупервайзд не будем.")
 
 show_separator("8. Обучить модель и вывести валидационный скор по метрике качества.", size="large")
 
-# Нормализует столбцы с А, по U.
-columns_to_normalize = train_df.columns.values[1:22]
-scaler: StandardScaler = StandardScaler()
-scaler.fit(train_df[columns_to_normalize])
-train_df[columns_to_normalize] = scaler.transform(train_df[columns_to_normalize])
-show_separator("Столбцы train_df нормализованы.")
+# Загружает нормализованные датафреймы или создаёт нормализованные датафреймы из ненормализованных.
 
-# Сохраняет скейлер в дамп в папку intermediate data/results/.
-filepath = Path(str("intermediate data/results/" + current_script_name + "_scaler_dump"))
-filepath.parent.mkdir(parents=True, exist_ok=True)
-dump(scaler, filepath, compress=True)
-show_separator("Скейлер сохранен в файл в папке results.")
+if path.exists(results_folder_path.joinpath(current_script_name + '_train_norm_df.csv')) \
+        and path.exists(results_folder_path.joinpath(current_script_name + '_cv_norm_df.csv')) \
+        and path.exists(results_folder_path.joinpath(current_script_name + '_test_norm_df.csv')):
+    # Вводные.
+    cv_norm_path = pathlib.Path("intermediate data/results/part 1.py_cv_norm_df.csv")
+    cv_target_path = pathlib.Path("intermediate data/results/part 1.py_cv_df_target.csv")
+    test_norm_path = pathlib.Path("intermediate data/results/part 1.py_test_norm_df.csv")
+    train_norm_path = pathlib.Path("intermediate data/results/part 1.py_train_norm_df.csv")
+    train_target_path = pathlib.Path("intermediate data/results/part 1.py_train_df_target.csv")
+
+    # Создаёт датафреймы.
+    cv_norm_df = pd.read_csv(cv_norm_path, index_col='ID')
+    cv_target_df = pd.read_csv(cv_target_path, index_col='ID')
+    test_norm_df = pd.read_csv(test_norm_path, index_col='ID')
+    train_norm_df = pd.read_csv(train_norm_path, index_col='ID')
+    train_target_df = pd.read_csv(train_target_path, index_col='ID')
+    show_separator("Нормализованные датафреймы загружены из файлов.")
+else:
+    # Вводные.
+    cv_path = pathlib.Path("intermediate data/results/part 1.py_cv_df.csv")
+    cv_target_path = pathlib.Path("intermediate data/results/part 1.py_cv_df_target.csv")
+    test_path = pathlib.Path("intermediate data/results/part 1.py_test_df.csv")
+    train_path = pathlib.Path("intermediate data/results/part 1.py_train_df.csv")
+    train_target_path = pathlib.Path("intermediate data/results/part 1.py_train_df_target.csv")
+
+    # Создаёт датафреймы.
+    cv_df = pd.read_csv(cv_path, index_col='ID')
+    cv_target_df = pd.read_csv(cv_target_path, index_col='ID')
+    test_df = pd.read_csv(test_path, index_col='ID')
+    train_df = pd.read_csv(train_path, index_col='ID')
+    train_target_df = pd.read_csv(train_target_path, index_col='ID')
+
+    # Нормализует столбцы с А по U и с А*А по U*U.
+    train_norm_df = train_df
+    cv_norm_df = cv_df
+    test_norm_df = test_df
+
+    # Создаёт и сохраняет скейлер в дамп в папку intermediate data/results/.
+    columns_to_normalize = pd.concat([train_norm_df.loc[:, "A":"U"], train_norm_df.loc[:, "A*A":"U*U"]], axis=1).columns
+    scaler: StandardScaler = StandardScaler()
+    scaler.fit(train_norm_df[columns_to_normalize])
+    filepath = Path(str("intermediate data/results/" + current_script_name + "_scaler_dump"))
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    dump(scaler, filepath, compress=True)
+    show_separator("Скейлер сохранен в файл в папке results.")
+
+    # Непосредственно нормализует столбцы и сохраняет в соответствующие файлы в папке results.
+    train_norm_df[columns_to_normalize] = scaler.transform(train_norm_df[columns_to_normalize])
+    save_results(current_script_name, train_norm_df, "train_norm_df")
+    show_separator("Столбцы train_df нормализованы и сохранены в файл train_norm_df.csv.")
+    cv_norm_df[columns_to_normalize] = scaler.transform(cv_norm_df[columns_to_normalize])
+    save_results(current_script_name, cv_norm_df, "cv_norm_df")
+    show_separator("Столбцы cv_df нормализованы и сохранены в файл cv_norm_df.csv.")
+    test_norm_df[columns_to_normalize] = scaler.transform(test_norm_df[columns_to_normalize])
+    save_results(current_script_name, test_norm_df, "test_norm_df")
+    show_separator("Столбцы test_df нормализованы и сохранены в файл test_norm_df.csv.")
 
 # Создаёт тензоры из датафреймов.
-cv_tensor: torch.Tensor = torch.Tensor(cv_df.drop(['ID'], axis=1).values)
-cv_target_tensor: torch.Tensor = torch.Tensor(cv_target_df.drop(['ID'], axis=1).values)
-test_tensor: torch.Tensor = torch.Tensor(test_df.drop(['ID'], axis=1).values)
-train_tensor: torch.Tensor = torch.Tensor(train_df.drop(['ID'], axis=1).values)
-train_target_tensor: torch.Tensor = torch.Tensor(train_target_df.drop(['ID'], axis=1).values)
+cv_norm_tensor: torch.Tensor = torch.Tensor(cv_norm_df.values)
+cv_target_tensor: torch.Tensor = torch.Tensor(cv_target_df.values)
+test_norm_tensor: torch.Tensor = torch.Tensor(test_norm_df.values)
+train_norm_tensor: torch.Tensor = torch.Tensor(train_norm_df.values)
+train_target_tensor: torch.Tensor = torch.Tensor(train_target_df.values)
 
 
 # Собирает модель логистической регрессии.
@@ -118,7 +112,7 @@ class LogisticRegression(torch.nn.Module):
         return y_prediction
 
 
-lr = LogisticRegression(train_tensor.size()[1])
+lr = LogisticRegression(train_norm_tensor.size()[1])
 
 # Задаёт параметры обучения.
 num_epochs = 1000
@@ -140,7 +134,7 @@ show_separator("Обучение модели на " + str(num_epochs) + " эп�
 loss_function_values_for_graph = dict()
 previous_loss_function_value = None
 for epoch in range(num_epochs):
-    y_pred = lr(train_tensor)
+    y_pred = lr(train_norm_tensor)
     loss = criterion(y_pred, train_target_tensor)
     loss.backward()
     optimizer.step()
@@ -164,7 +158,7 @@ show_separator("Параметры модели сохранены в папке
 # Выводит метрики результата для train.
 show_separator("Текущие метрики для train:")
 with torch.no_grad():
-    target_predicted = lr(train_tensor)
+    target_predicted = lr(train_norm_tensor)
     target_predicted_class = target_predicted.round()
     acc = target_predicted_class.eq(train_target_tensor).sum() / float(train_target_tensor.shape[0])
     print(f'accuracy: {acc.item():.4f}')
@@ -175,7 +169,7 @@ with torch.no_grad():
 # Выводит метрики результата для CV.
 show_separator("Текущие метрики для CV:")
 with torch.no_grad():
-    target_predicted = lr(cv_tensor)
+    target_predicted = lr(cv_norm_tensor)
     target_predicted_class = target_predicted.round()
     acc = target_predicted_class.eq(cv_target_tensor).sum() / float(cv_target_tensor.shape[0])
     print(f'accuracy: {acc.item():.4f}')

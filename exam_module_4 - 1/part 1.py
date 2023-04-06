@@ -68,6 +68,13 @@ train_df_target = train_cv_df.sample(frac=(1 - cv_fraction), random_state=random
 cv_df = train_cv_df.drop(train_df.index).drop('mutation', axis=1)
 cv_df_target = train_cv_df.drop(train_df_target.index)[['mutation']]
 
+# Добавляем новые фичи на основе имеющихся (взаимные перемножения).
+for column1 in train_df.loc[:, "A":"U"].columns:
+    for column2 in train_df.loc[:, "A":"U"].columns:
+        cv_df[column1 + "*" + column2] = cv_df[column1] * cv_df[column2]
+        test_df[column1 + "*" + column2] = test_df[column1] * test_df[column2]
+        train_df[column1 + "*" + column2] = train_df[column1] * train_df[column2]
+
 # Просмотр данных перед сохранением.
 inspect_data(current_script_name, train_df, "train_df")
 inspect_data(current_script_name, train_df_target, "train_df_target")
